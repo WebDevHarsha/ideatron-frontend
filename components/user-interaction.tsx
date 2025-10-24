@@ -31,31 +31,27 @@ export function UserInteraction() {
 
     setLoading(true)
 
-    // Simulate API call - in production, this would call Gemini API
-    setTimeout(() => {
-      const mockIdeas: GeneratedIdea[] = [
-        {
-          title: `${interest} Analytics Dashboard`,
-          description: `Real-time analytics platform for ${interest} with AI-powered insights, predictive modeling, and automated reporting features.`,
-          difficulty: "Medium",
-          wowFactor: 4,
+    try {
+      const response = await fetch("/api/generate-ideas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          title: `Smart ${interest} Assistant`,
-          description: `AI-powered virtual assistant specialized in ${interest} that provides personalized recommendations and automates routine tasks.`,
-          difficulty: "Hard",
-          wowFactor: 5,
-        },
-        {
-          title: `${interest} Community Hub`,
-          description: `Social platform connecting ${interest} enthusiasts with collaborative tools, knowledge sharing, and gamified learning experiences.`,
-          difficulty: "Easy",
-          wowFactor: 3,
-        },
-      ]
-      setIdeas(mockIdeas)
+        body: JSON.stringify({ interest }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to generate ideas")
+      }
+
+      const data = await response.json()
+      setIdeas(data.ideas)
+    } catch (error) {
+      console.error("Error generating ideas:", error)
+      setIdeas([])
+    } finally {
       setLoading(false)
-    }, 1500)
+    }
   }
 
   return (
